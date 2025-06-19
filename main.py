@@ -3,6 +3,11 @@ import requests
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from prometheus_client import Gauge, generate_latest, CONTENT_TYPE_LATEST
 import logging
+import threading
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Console Logger Config
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -14,6 +19,11 @@ URLS = [
     "https://httpstat.us/200"
 ]
 
+# Parsing the environment variables
+INTERVAL = int(os.getenv('INTERVAL', '30'))
+HTTP_PORT = int(os.getenv('HTTP_PORT', '8080'))
+print(INTERVAL, HTTP_PORT)
+
 
 # Prometheus metrics
 is_up_metric = Gauge('sample_external_url_up', 'URL availability (1=up, 0=down)', ['url'])
@@ -23,6 +33,8 @@ class URLMonitoring:
     def __init__(self, urls, interval=30):
         self.urls = urls
         self.interval = interval
+        self.running = False
+        self.thread = None
     
     # Gather Monitoring metrics
     def monitor_url(self, url):
@@ -53,6 +65,21 @@ class URLMonitoring:
             
             time.sleep(self.interval)
 
+    # Start monitoring loop and ensure only one process is running
+    def start_monitoring(self):
+        if not self.running:
+            self.running = True
+            self.thread = threading.Thread(target=self.monitor_loop, daemon=True)
+            self.thread.start()
+            logger.info("URL monitoring started")
+
+    # Stop monitoring loop
+    def stop_monitoring(self):
+        self.running = False
+        if self.thread:
+            self.thread.join()
+        logger.info("URL monitoring stopped")
+
 class MetricsHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == '/metrics':
@@ -78,8 +105,10 @@ class MetricsHandler(BaseHTTPRequestHandler):
         logger.info(f"{self.address_string()} - {format % args}")
 
 def main():
-    # Initialize URL monitor
-    monitor = URLMonitoring(URLS, interval=30)
+    # Initialize URL monitor, interval defaulting to 30 seconds if missing
+    monitor = URLMonitoring(URLS, INTERVAL)
+
+    monitor.start_monitoring()
     
     # First check of the metrics before startup
     for url in URLS:
@@ -87,17 +116,17 @@ def main():
         is_up_metric.labels(url=url).set(is_up)
         response_ms_metric.labels(url=url).set(response_time)
     
-    # Start the HTTP server
-    server_port = 8080
-    server = HTTPServer(('0.0.0.0', server_port), MetricsHandler)
+    # Start the HTTP server, port defaults to 8080 if missing
+    server = HTTPServer(('0.0.0.0', HTTP_PORT), MetricsHandler)
     
-    logger.info(f"Starting HTTP server on port {server_port}")
-    logger.info(f"Metrics available at http://localhost:{server_port}/metrics")
-    logger.info(f"Health check available at http://localhost:{server_port}/health")
+    logger.info(f"Starting HTTP server on port {HTTP_PORT}")
+    logger.info(f"Metrics available at http://localhost:{HTTP_PORT}/metrics")
+    logger.info(f"Health check available at http://localhost:{HTTP_PORT}/health")
     
     try:
         server.serve_forever()
     except KeyboardInterrupt:
+        monitor.stop_monitoring()
         server.shutdown()
 
 if __name__ == '__main__':
