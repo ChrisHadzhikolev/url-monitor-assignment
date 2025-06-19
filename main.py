@@ -126,7 +126,6 @@ def main():
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        monitor.stop_monitoring()
         server.shutdown()
 
 if __name__ == '__main__':
