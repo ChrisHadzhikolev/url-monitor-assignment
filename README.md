@@ -35,6 +35,12 @@ The values.yaml file can be found in *deployment* folder, if any changes needed 
 #### Uninstall Application
 - Run `helm uninstall <application-name> -n <your-namespace>`
 
+## General Notes 
+- Right now httpstat.us is down - metrics are still running, but the response is always HTTP Code 503.
+- There is a helm template for ingress, but givven the scope of the assignment it is currently disabled in values.yaml.
+- The kubernetes service for the application is currently LoadBalancer so metrics can be accessed out of the cluster (without port-forwarding).
+- The application has custom logging format.
+- The application includes code comments for clarity.
 ## Screenshots
 ### Successfully Deployed on GKE
 ![Screenshot](assets/ScreenshotGKE.png)
