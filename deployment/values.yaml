@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: krishum77/url-monitoring-assignment
+  repository: krishum77/url-monitor-assignment
   pullPolicy: Always
   tag: "latest"
 
