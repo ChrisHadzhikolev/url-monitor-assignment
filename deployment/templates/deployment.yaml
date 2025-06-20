@@ -39,7 +39,7 @@ spec:
               protocol: TCP
           env:
             - name: INTERVAL
-              value: {{ .Values.app.checkInterval | quote }}
+              value: {{ .Values.app.interval | quote }}
             - name: HTTP_PORT
               value: {{ .Values.service.targetPort | quote }}
           {{- if .Values.probes.liveness.enabled }}
