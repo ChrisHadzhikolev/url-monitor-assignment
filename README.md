@@ -26,10 +26,18 @@ There is already created public docker image (krishum77/url-monitor-assignment) 
 - Run `docker build -t <your-repository> .`
 - Run `docker push <tag>`
 *Note: On MacOS there is an issue with architecture (amd64). In that case force architecture with --platform flag.*
+*Note: Default port in Dockerfile is 8080 and can be edited.*
 #### Deployment with Helm
-The values.yaml file can be found in *deployment* folder, if any changes needed to the configuration e.g changing the docker repository.
+The values.yaml file can be found in *deployment* folder, if any changes needed to the configuration e.g changing the docker repository or check interval.
 - Make sure Kubernetes is running
 - Run `helm install <application-name> ./deployment` or `helm install <application-name> ./deployment --namespace <your-namespace> --create-namespace` (recommended not to deploy in the default namespace)
+- After the kubernetes service gets external IP address metrics can be accessed on `<external-ip>/metrics`
 #### Uninstall Application
 - Run `helm uninstall <application-name> -n <your-namespace>`
+
+## Screenshots
+### Successfully Deployed on GKE
+![Screenshot](assets/ScreenshotGKE.png)
+### Prometheus Metrics 
+![Screenshot](assets/ScreenshotMetrics.png)
   
