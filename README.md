@@ -11,7 +11,7 @@
 ### Running Locally (with Virtual environment - venv)
 #### Setting up the virtual environment
 - Run `python3 -m venv venv` to create the environment 
-- Run `source ./venv/bin/activate` for MacOS/ `"venv\Scripts\activate"` for Windows OS to activate the environment
+- Run `source ./venv/bin/activate` for MacOS or `"venv\Scripts\activate"` for Windows OS to activate the environment
 - Run `pip install -r requirements.txt` to install the required dependecies in the environment
 #### Creating environment variable file (optional)
 The http port and the check interval are setup as environment variables, which default to 8080 and 30 (seconds) respectively. To change them to custom values go through  the following steps:
