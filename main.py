@@ -22,7 +22,6 @@ URLS = [
 # Parsing the environment variables
 INTERVAL = int(os.getenv('INTERVAL', '30'))
 HTTP_PORT = int(os.getenv('HTTP_PORT', '8080'))
-print(INTERVAL, HTTP_PORT)
 
 
 # Prometheus metrics
@@ -73,7 +72,7 @@ class URLMonitoring:
             self.thread.start()
             logger.info("URL monitoring started")
 
-    # Stop monitoring loop
+    # Stop monitoring loop (useful function to have for expanding the application)
     def stop_monitoring(self):
         self.running = False
         if self.thread:
@@ -120,6 +119,7 @@ def main():
     server = HTTPServer(('0.0.0.0', HTTP_PORT), MetricsHandler)
     
     logger.info(f"Starting HTTP server on port {HTTP_PORT}")
+    # Counts for local running local
     logger.info(f"Metrics available at http://localhost:{HTTP_PORT}/metrics")
     logger.info(f"Health check available at http://localhost:{HTTP_PORT}/health")
     
